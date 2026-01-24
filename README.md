@@ -18,3 +18,4 @@ ao_strength: Blending strength of the approximated ambient occulsion.
 * While I was able to implement basic ambient occusion, adding proper shadows (either self shadows or from other objects) would require raymarching.
 
 <img width="1917" height="1197" alt="Screenshot from 2026-01-24 18-13-54" src="https://github.com/user-attachments/assets/0576aa21-f376-4e40-90f9-9981701f0b49" />
+Image is rendeder on my laptop (Intel® Core™ Ultra 5 226V, integrated Intel Arc Graphics 130V, 1920x1200 resolution). 300+ FPS is achivable when the post processing is disabled.
