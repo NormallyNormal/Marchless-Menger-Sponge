@@ -2,6 +2,8 @@
 This is a Godot 4 (4.5.1) spatial fragment shader that renders a Menger Sponge fractal onto a plane mesh surface.
 Instead of using thousands of polygons to model, or implementing expensive raymarching, this uses a fast raycast check for each fractal level, which removes the need for iterative "marching."
 
+menger_sponge.gdshader is the only file of real significance. Everything else is setup for the demo project.
+
 ## Parameters
 hole_iterations: Number of fractal iterations for the hole pattern. Higher = more detail, more cost.
 
