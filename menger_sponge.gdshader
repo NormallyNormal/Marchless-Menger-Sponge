@@ -5,17 +5,18 @@ uniform int cut_iterations : hint_range(1, 4) = 2;
 uniform float hole_depth : hint_range(0.1, 5.0) = 1.0;
 uniform vec3 surface_color : source_color = vec3(1.0);
 uniform float ao_strength : hint_range(0.0, 1.0) = 0.5;
+uniform bool orthographic = false;
 
 varying vec3 original_normal;
 
-int check_hole(vec2 uv, out vec2 local_uv, out float current_scale, int max_iterations) {
+int check_hole(vec2 uv, out vec2 local_uv, out float current_scale, int max_iterations, int maxsuperhole) {
     vec2 p = uv;
     
 	int largest_hole = 0;
     vec2 largest_local_uv;
     float largest_scale;
     
-    for (int i = 1; i <= max_iterations; i++) {
+    for (int i = 1; i <= maxsuperhole; i++) {
         float scale = pow(3.0, float(i));
         vec2 cell = floor(p / scale);
         vec2 local = fract(p / scale);
@@ -131,10 +132,17 @@ void fragment() {
 	vec2 local_uv;
 	float current_scale;
 	
-	int level = check_hole(uv, local_uv, current_scale, hole_iterations);
+	vec3 view_dir;
+    if (orthographic) {
+        vec3 cam_forward = normalize(INV_VIEW_MATRIX[2].xyz);
+        view_dir = normalize((VIEW_MATRIX * vec4(cam_forward, 0.0)).xyz);
+    } else {
+        view_dir = normalize(VIEW);
+    }
+	
+	int level = check_hole(uv, local_uv, current_scale, hole_iterations, 0);
 	
 	if (level != 0) {
-		vec3 view_dir = normalize(VIEW);
 		vec3 tan_view = vec3(
 			dot(view_dir, TANGENT),
 			dot(view_dir, BINORMAL),
@@ -171,7 +179,7 @@ void fragment() {
 			
 			vec2 inner_local_uv;
 			float inner_scale;
-			int inner_level = check_hole(cur_face_uv, inner_local_uv, inner_scale, hole_iterations - total_level);
+			int inner_level = check_hole(cur_face_uv, inner_local_uv, inner_scale, hole_iterations - total_level, hole_iterations - total_level);
 			
 			if (inner_level == 0) {
 				break;
@@ -268,5 +276,5 @@ void light() {
 	float NdotL = max(dot(NORMAL, LIGHT), 0.0);
 	float surface_NdotL = max(dot(original_normal, LIGHT), 0.0);
 	NdotL = min(NdotL, surface_NdotL);
-	DIFFUSE_LIGHT += LIGHT_COLOR * ATTENUATION * NdotL;
+	DIFFUSE_LIGHT += LIGHT_COLOR / PI * ATTENUATION * clamp(NdotL, 0.0, 1.0);
 }

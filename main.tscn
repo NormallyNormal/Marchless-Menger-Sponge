@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://bxit7scrjjod"]
+[gd_scene load_steps=5 format=3 uid="uid://bxit7scrjjod"]
 
 [ext_resource type="PackedScene" uid="uid://cqupusd727gd4" path="res://CUBE.tscn" id="1_ig7tw"]
 [ext_resource type="Script" uid="uid://dvlbf3tilki2m" path="res://fps.gd" id="2_0xm2m"]
@@ -13,15 +13,12 @@ glow_enabled = true
 glow_intensity = 1.0
 glow_strength = 0.94
 
+[sub_resource type="SphereShape3D" id="SphereShape3D_0xm2m"]
+radius = 0.866
+
 [node name="Main" type="Node3D"]
 
 [node name="SPONGE" parent="." instance=ExtResource("1_ig7tw")]
-
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(0.7071068, 0.35355338, -0.61237246, 0, 0.8660254, 0.50000006, 0.7071068, -0.35355338, 0.61237246, -1.1, 0.808, 1.1)
-keep_aspect = 0
-current = true
-fov = 70.0
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.096072584, -0.6830603, -0.7240158, -0.1248934, -0.7299041, 0.67204297, -0.9875078, 0.025859863, -0.15543348, -1.0510683, 0.79771286, -0.06580871)
@@ -35,3 +32,12 @@ offset_bottom = 136.0
 theme_override_font_sizes/font_size = 16
 text = "99"
 script = ExtResource("2_0xm2m")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(0.70710677, 0.35355338, -0.6123724, 0, 0.8660254, 0.5, 0.70710677, -0.35355338, 0.6123724, 0, 0, 0)
+shape = SubResource("SphereShape3D_0xm2m")
+
+[node name="Camera3D" type="Camera3D" parent="CollisionShape3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+keep_aspect = 0
+current = true
