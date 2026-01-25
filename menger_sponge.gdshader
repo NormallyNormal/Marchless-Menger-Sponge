@@ -1,5 +1,4 @@
 shader_type spatial;
-render_mode cull_disabled;
 
 uniform int hole_iterations : hint_range(1, 6) = 5;
 uniform int cut_iterations : hint_range(1, 4) = 2;
@@ -76,18 +75,6 @@ vec3 ray_box_interior(vec2 hole_uv, vec3 view_dir, float depth, float depth_stre
 		return vec3(0.0);
 	}
 	
-	if (abs(hit.x - 1.0) < eps) {
-		face_id = 1;
-		face_uv = vec2((-hit.z) / depth, (hit.y + 1.0) / 2.0);
-		return vec3(-1.0, 0.0, 0.0);
-	}
-	
-	if (abs(hit.x + 1.0) < eps) {
-		face_id = 2;
-		face_uv = vec2((-hit.z) / depth, (hit.y + 1.0) / 2.0);
-		return vec3(1.0, 0.0, 0.0);
-	}
-	
 	if (abs(hit.y - 1.0) < eps) {
 		face_id = 4;
 		face_uv = vec2((hit.x + 1.0) / 2.0, (-hit.z) / depth);
@@ -100,31 +87,44 @@ vec3 ray_box_interior(vec2 hole_uv, vec3 view_dir, float depth, float depth_stre
 		return vec3(0.0, -1.0, 0.0);
 	}
 	
+	if (abs(hit.x + 1.0) < eps) {
+		face_id = 2;
+		face_uv = vec2((-hit.z) / depth, (hit.y + 1.0) / 2.0);
+		return vec3(1.0, 0.0, 0.0);
+	}
+	
+	if (abs(hit.x - 1.0) < eps) {
+		face_id = 1;
+		face_uv = vec2((-hit.z) / depth, (hit.y + 1.0) / 2.0);
+		return vec3(-1.0, 0.0, 0.0);
+	}
+	
 	return vec3(0.0, 0.0, 1.0);
 }
 
 float calculate_ao(vec2 face_uv, float z_depth, vec2 hole_uv, int face_id) {
-	float ao = 1.0;
-	float adjacent_edge = 0.0;
-	
-	if (face_id == 2 || face_id == 1) {
-		adjacent_edge = min(face_uv.y, 1.0 - face_uv.y);
-		ao *= smoothstep(0.0, 0.25, adjacent_edge);
-	}
-	if (face_id == 3 || face_id == 4) {
-		adjacent_edge = min(face_uv.x, 1.0 - face_uv.x);
-		ao *= smoothstep(0.0, 0.25, adjacent_edge);
-	}
-	
-	ao *= mix(1.0, 0.7, z_depth);
-	
-	return ao;
+    if (face_uv.x < 0.0 || face_uv.x > 1.0 || face_uv.y < 0.0 || face_uv.y > 1.0) {
+        return 1.0;
+    }
+    
+    float ao = 1.0;
+    float adjacent_edge = 0.0;
+    
+    if (face_id == 2 || face_id == 1) {
+        adjacent_edge = min(face_uv.y, 1.0 - face_uv.y);
+        ao *= smoothstep(0.0, 0.25, adjacent_edge);
+    }
+    if (face_id == 3 || face_id == 4) {
+        adjacent_edge = min(face_uv.x, 1.0 - face_uv.x);
+        ao *= smoothstep(0.0, 0.25, adjacent_edge);
+    }
+    
+    ao *= mix(1.0, 0.7, z_depth);
+    
+    return ao;
 }
 
 void fragment() {
-	if (!FRONT_FACING) {
-		discard;
-	}
 	ALBEDO = surface_color;
 	original_normal = NORMAL;
 	vec2 uv = UV;
@@ -208,6 +208,17 @@ void fragment() {
 				handedness *= -1.0;
 			}
 			
+			if (inner_level <= -2) {
+				if (cur_face_id == 4 || cur_face_id == 3) {
+					inner_local_uv.x = inner_local_uv.x + 1.0/3.0;
+					
+				}
+				if (cur_face_id == 1 || cur_face_id == 2) {
+					inner_local_uv.y = inner_local_uv.y + 1.0/3.0;
+					
+				}
+			}
+			
 			wall_tangent = normalize(wall_tangent);
 			wall_binormal = normalize(wall_binormal);
 			
@@ -245,7 +256,7 @@ void fragment() {
 		);
 		
 		float ao = mix(1.0, ao_total, ao_strength); 
-		float depth_darken = exp(-float(total_level) * 0.3); 
+		float depth_darken = exp(-float(total_level) * 0.3);
 		ALBEDO = ALBEDO * ao * depth_darken * 0.4;
 		
 	} else {
@@ -253,29 +264,9 @@ void fragment() {
 	}
 }
 
-//void vertex() {
-	//vec3 world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
-	//vec3 world_normal = (MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz;
-	//vec3 view_dir = normalize(world_pos - CAMERA_POSITION_WORLD);
-	//
-	//bool front_facing = dot(view_dir, world_normal) < 0.0;
-	//if (!front_facing) {
-		//VERTEX = VERTEX - NORMAL * 0.33333;
-		//world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
-		//view_dir = normalize(world_pos - CAMERA_POSITION_WORLD);
-		//front_facing = dot(view_dir, world_normal) < 0.0;
-		//if (front_facing) {
-			//VERTEX = vec3(0.0);
-		//}
-	//}
-//}
-
 void light() {
 	float NdotL = max(dot(NORMAL, LIGHT), 0.0);
-
 	float surface_NdotL = max(dot(original_normal, LIGHT), 0.0);
-	
 	NdotL = min(NdotL, surface_NdotL);
-	
 	DIFFUSE_LIGHT += LIGHT_COLOR * ATTENUATION * NdotL;
 }
