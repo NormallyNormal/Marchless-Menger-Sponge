@@ -1,7 +1,21 @@
-[gd_scene load_steps=5 format=3 uid="uid://bxit7scrjjod"]
+[gd_scene load_steps=12 format=3 uid="uid://bxit7scrjjod"]
 
 [ext_resource type="PackedScene" uid="uid://cqupusd727gd4" path="res://CUBE.tscn" id="1_ig7tw"]
 [ext_resource type="Script" uid="uid://dvlbf3tilki2m" path="res://fps.gd" id="2_0xm2m"]
+[ext_resource type="Shader" uid="uid://b3vlw1ftkn8hr" path="res://stripes.gdshader" id="3_1bvp3"]
+[ext_resource type="Shader" uid="uid://b7b4ftm0j1rhh" path="res://depth.gdshader" id="3_h2yge"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lquwl"]
+render_priority = 1
+shader = ExtResource("3_1bvp3")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7mycd"]
+next_pass = SubResource("ShaderMaterial_lquwl")
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_h2yge"]
+top_radius = 0.1
+bottom_radius = 0.1
+height = 4.0
 
 [sub_resource type="Environment" id="Environment_ig7tw"]
 background_mode = 1
@@ -16,12 +30,24 @@ glow_strength = 0.94
 [sub_resource type="SphereShape3D" id="SphereShape3D_0xm2m"]
 radius = 0.866
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1bvp3"]
+render_priority = 0
+shader = ExtResource("3_h2yge")
+
+[sub_resource type="QuadMesh" id="QuadMesh_lquwl"]
+
 [node name="Main" type="Node3D"]
 
 [node name="SPONGE" parent="." instance=ExtResource("1_ig7tw")]
 
+[node name="Cylinder" type="MeshInstance3D" parent="SPONGE"]
+material_override = SubResource("StandardMaterial3D_7mycd")
+mesh = SubResource("CylinderMesh_h2yge")
+skeleton = NodePath("../..")
+
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.096072584, -0.6830603, -0.7240158, -0.1248934, -0.7299041, 0.67204297, -0.9875078, 0.025859863, -0.15543348, -1.0510683, 0.79771286, -0.06580871)
+transform = Transform3D(0.096072584, -0.6830603, -0.7240158, -0.1248934, -0.7299041, 0.67204297, -0.9875078, 0.025859889, -0.15543349, -4.191234, 2.8450701, -2.8093805)
+shadow_enabled = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_ig7tw")
@@ -38,6 +64,12 @@ transform = Transform3D(0.70710677, 0.35355338, -0.6123724, 0, 0.8660254, 0.5, 0
 shape = SubResource("SphereShape3D_0xm2m")
 
 [node name="Camera3D" type="Camera3D" parent="CollisionShape3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+transform = Transform3D(1.0000001, 0, 0, 0, 1, 2.9802322e-08, 0, -2.9802322e-08, 1.0000001, 0, -0.13402975, 1.9226179)
 keep_aspect = 0
 current = true
+
+[node name="DepthQuad" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0010103732, 0.58779514)
+visible = false
+material_override = SubResource("ShaderMaterial_1bvp3")
+mesh = SubResource("QuadMesh_lquwl")

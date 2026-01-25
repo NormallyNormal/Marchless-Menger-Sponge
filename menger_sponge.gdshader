@@ -10,45 +10,43 @@ uniform bool orthographic = false;
 varying vec3 original_normal;
 
 int check_hole(vec2 uv, out vec2 local_uv, out float current_scale, int max_iterations, int maxsuperhole) {
-    vec2 p = uv;
-    
+	vec2 p = uv;
+	
 	int largest_hole = 0;
-    vec2 largest_local_uv;
-    float largest_scale;
-    
-    for (int i = 1; i <= maxsuperhole; i++) {
-        float scale = pow(3.0, float(i));
-        vec2 cell = floor(p / scale);
-        vec2 local = fract(p / scale);
-        if (floor(local.x * 3.0) == 1.0 || floor(local.y * 3.0) == 1.0) {
-            largest_local_uv = fract(local * 3.0);
-            largest_scale = scale / 3.0;
-            largest_hole = -i;
-        }
-    }
-    
-    if (largest_hole < 0) {
-        local_uv = largest_local_uv;
-        current_scale = largest_scale;
-        return largest_hole;
-    }
-
-    for (int i = 0; i < max_iterations; i++) {
-        vec2 cell = floor(p * 3.0);
-        vec2 local = fract(p * 3.0);
-
-        if (cell.x == 1.0 && cell.y == 1.0) {
-            local_uv = local;
-            current_scale = 1.0 / pow(3.0, float(i + 1));
-            return i + 1;
-        }
-
-        p = p * 3.0 - cell;
-    }
-    return 0;
+	vec2 largest_local_uv;
+	float largest_scale;
+	
+	for (int i = 1; i <= maxsuperhole; i++) {
+		float scale = pow(3.0, float(i));
+		vec2 cell = floor(p / scale);
+		vec2 local = fract(p / scale);
+		if (floor(local.x * 3.0) == 1.0 || floor(local.y * 3.0) == 1.0) {
+			largest_local_uv = fract(local * 3.0);
+			largest_scale = scale / 3.0;
+			largest_hole = -i;
+		}
+	}
+	
+	if (largest_hole < 0) {
+		local_uv = largest_local_uv;
+		current_scale = largest_scale;
+		return largest_hole;
+	}
+	
+	for (int i = 0; i < max_iterations; i++) {
+		vec2 cell = floor(p * 3.0);
+		vec2 local = fract(p * 3.0);
+		if (cell.x == 1.0 && cell.y == 1.0) {
+			local_uv = local;
+			current_scale = 1.0 / pow(3.0, float(i + 1));
+			return i + 1;
+		}
+		p = p * 3.0 - cell;
+	}
+	return 0;
 }
 
-vec3 ray_box_interior(vec2 hole_uv, vec3 view_dir, float depth, float depth_stretch, out vec2 face_uv, out int face_id, out float z_depth) {
+vec3 ray_box_interior(vec2 hole_uv, vec3 view_dir, float depth, float depth_stretch, out vec2 face_uv, out int face_id, out float z_depth, out float ray_length) {
 	vec2 pos = hole_uv * 2.0 - 1.0;
 	
 	vec3 ro = vec3(pos, 0.0);
@@ -62,6 +60,7 @@ vec3 ray_box_interior(vec2 hole_uv, vec3 view_dir, float depth, float depth_stre
 	
 	vec3 t_far = max(t1, t2);
 	float t = min(min(t_far.x, t_far.y), t_far.z);
+	ray_length = abs(t);
 	
 	vec3 hit = ro + rd * t;
 	
@@ -104,25 +103,25 @@ vec3 ray_box_interior(vec2 hole_uv, vec3 view_dir, float depth, float depth_stre
 }
 
 float calculate_ao(vec2 face_uv, float z_depth, vec2 hole_uv, int face_id) {
-    if (face_uv.x < 0.0 || face_uv.x > 1.0 || face_uv.y < 0.0 || face_uv.y > 1.0) {
-        return 1.0;
-    }
-    
-    float ao = 1.0;
-    float adjacent_edge = 0.0;
-    
-    if (face_id == 2 || face_id == 1) {
-        adjacent_edge = min(face_uv.y, 1.0 - face_uv.y);
-        ao *= smoothstep(0.0, 0.25, adjacent_edge);
-    }
-    if (face_id == 3 || face_id == 4) {
-        adjacent_edge = min(face_uv.x, 1.0 - face_uv.x);
-        ao *= smoothstep(0.0, 0.25, adjacent_edge);
-    }
-    
-    ao *= mix(1.0, 0.7, z_depth);
-    
-    return ao;
+	if (face_uv.x < 0.0 || face_uv.x > 1.0 || face_uv.y < 0.0 || face_uv.y > 1.0) {
+		return 1.0;
+	}
+	
+	float ao = 1.0;
+	float adjacent_edge = 0.0;
+	
+	if (face_id == 2 || face_id == 1) {
+		adjacent_edge = min(face_uv.y, 1.0 - face_uv.y);
+		ao *= smoothstep(0.0, 0.25, adjacent_edge);
+	}
+	if (face_id == 3 || face_id == 4) {
+		adjacent_edge = min(face_uv.x, 1.0 - face_uv.x);
+		ao *= smoothstep(0.0, 0.25, adjacent_edge);
+	}
+	
+	ao *= mix(1.0, 0.7, z_depth);
+	
+	return ao;
 }
 
 void fragment() {
@@ -131,14 +130,19 @@ void fragment() {
 	vec2 uv = UV;
 	vec2 local_uv;
 	float current_scale;
+	float total_ray_length = 0.0;
+	float accumulated_scale = 1.0;
+	
+	vec4 clip_pos = PROJECTION_MATRIX * vec4(VERTEX, 1.0);
+	DEPTH = clip_pos.z / clip_pos.w;
 	
 	vec3 view_dir;
-    if (orthographic) {
-        vec3 cam_forward = normalize(INV_VIEW_MATRIX[2].xyz);
-        view_dir = normalize((VIEW_MATRIX * vec4(cam_forward, 0.0)).xyz);
-    } else {
-        view_dir = normalize(VIEW);
-    }
+	if (orthographic) {
+		vec3 cam_forward = normalize(INV_VIEW_MATRIX[2].xyz);
+		view_dir = normalize((VIEW_MATRIX * vec4(cam_forward, 0.0)).xyz);
+	} else {
+		view_dir = normalize(VIEW);
+	}
 	
 	int level = check_hole(uv, local_uv, current_scale, hole_iterations, 0);
 	
@@ -153,7 +157,11 @@ void fragment() {
 		vec2 face_uv;
 		int face_id;
 		float z_depth;
-		vec3 tan_normal = ray_box_interior(local_uv, tan_view, hole_depth * 2.0, pow(3.0, float(level)), face_uv, face_id, z_depth);
+		float ray_length;
+		vec3 tan_normal = ray_box_interior(local_uv, tan_view, hole_depth * 2.0, pow(3.0, float(level)), face_uv, face_id, z_depth, ray_length);
+		
+		accumulated_scale = current_scale / 2.0;
+		total_ray_length += ray_length * accumulated_scale;
 		
 		if (face_id == 0) {
 			discard;
@@ -171,7 +179,7 @@ void fragment() {
 		vec3 cur_tan_normal = tan_normal;
 		
 		float handedness = FRONT_FACING ? 1.0 : -1.0;
-
+		
 		for (int cut = 0; cut < cut_iterations; cut++) {
 			if (cur_face_id < 1 || cur_face_id > 4) {
 				break;
@@ -206,6 +214,7 @@ void fragment() {
 				wall_tangent = cur_tangent;
 				wall_binormal = handedness * cross(wall_normal, wall_tangent);
 			}
+			
 			if (cur_face_id == 2) {
 				wall_tangent = -wall_tangent;
 			}
@@ -218,12 +227,10 @@ void fragment() {
 			
 			if (inner_level <= -2) {
 				if (cur_face_id == 4 || cur_face_id == 3) {
-					inner_local_uv.x = inner_local_uv.x + 1.0/3.0;
-					
+					inner_local_uv.x = inner_local_uv.x + 1.0 / 3.0;
 				}
 				if (cur_face_id == 1 || cur_face_id == 2) {
-					inner_local_uv.y = inner_local_uv.y + 1.0/3.0;
-					
+					inner_local_uv.y = inner_local_uv.y + 1.0 / 3.0;
 				}
 			}
 			
@@ -240,7 +247,11 @@ void fragment() {
 			vec2 new_face_uv;
 			int new_face_id;
 			float new_z_depth;
-			vec3 new_tan_normal = ray_box_interior(inner_local_uv, inner_tan_view, hole_depth * 2.0, pow(3.0, float(abs(inner_level))), new_face_uv, new_face_id, new_z_depth);
+			float new_ray_length;
+			vec3 new_tan_normal = ray_box_interior(inner_local_uv, inner_tan_view, hole_depth * 2.0, pow(3.0, float(abs(inner_level))), new_face_uv, new_face_id, new_z_depth, new_ray_length);
+			
+			accumulated_scale *= inner_scale;
+			total_ray_length += new_ray_length * accumulated_scale;
 			
 			if (new_face_id == 0) {
 				discard;
@@ -256,16 +267,20 @@ void fragment() {
 			cur_binormal = wall_binormal;
 			cur_normal = wall_normal;
 		}
-
+		
 		NORMAL = normalize(
 			cur_tan_normal.x * cur_tangent +
 			cur_tan_normal.y * cur_binormal +
 			cur_tan_normal.z * cur_normal
 		);
 		
-		float ao = mix(1.0, ao_total, ao_strength); 
+		float ao = mix(1.0, ao_total, ao_strength);
 		float depth_darken = exp(-float(total_level) * 0.3);
 		ALBEDO = ALBEDO * ao * depth_darken * 0.4;
+		
+		vec3 interior_pos = VERTEX - normalize(VIEW) * total_ray_length;
+		clip_pos = PROJECTION_MATRIX * vec4(interior_pos, 1.0);
+		DEPTH = clip_pos.z / clip_pos.w;
 		
 	} else {
 		ALBEDO = ALBEDO * ((FRONT_FACING) ? 1.0 : 0.4);

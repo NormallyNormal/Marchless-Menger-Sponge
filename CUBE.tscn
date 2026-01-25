@@ -11,6 +11,7 @@ shader_parameter/cut_iterations = 4
 shader_parameter/hole_depth = 1.0
 shader_parameter/surface_color = Color(1, 1, 1, 1)
 shader_parameter/ao_strength = 0.5
+shader_parameter/orthographic = false
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_a202f"]
 size = Vector2(1, 1)
@@ -23,41 +24,35 @@ script = ExtResource("1_emqm4")
 [node name="POSY" type="MeshInstance3D" parent="FACES"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 material_override = SubResource("ShaderMaterial_noarx")
-cast_shadow = 0
 mesh = SubResource("PlaneMesh_a202f")
 skeleton = NodePath("../..")
 
 [node name="NEGY" type="MeshInstance3D" parent="FACES"]
 transform = Transform3D(4.3711385e-08, -3.8213705e-15, 0.99999994, -8.742277e-08, -0.9999999, 0, 0.99999994, -8.742277e-08, -4.3711385e-08, 0, -0.5, 0)
 material_override = SubResource("ShaderMaterial_noarx")
-cast_shadow = 0
 mesh = SubResource("PlaneMesh_a202f")
 skeleton = NodePath("../..")
 
 [node name="NEGX" type="MeshInstance3D" parent="FACES"]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, -0.5, 0, 0)
 material_override = SubResource("ShaderMaterial_noarx")
-cast_shadow = 0
 mesh = SubResource("PlaneMesh_a202f")
 skeleton = NodePath("../..")
 
 [node name="POSX" type="MeshInstance3D" parent="FACES"]
 transform = Transform3D(4.371139e-08, 0.9999999, -8.742277e-08, 1, -4.3711385e-08, 0, -3.821371e-15, -8.742277e-08, -0.9999999, 0.5, 0, 0)
 material_override = SubResource("ShaderMaterial_noarx")
-cast_shadow = 0
 mesh = SubResource("PlaneMesh_a202f")
 skeleton = NodePath("../..")
 
 [node name="NEGZ" type="MeshInstance3D" parent="FACES"]
 transform = Transform3D(1.910685e-15, 4.371138e-08, -0.99999976, 0.9999999, -4.371138e-08, 0, -4.371138e-08, -0.9999999, -4.3711378e-08, 1.5437603e-05, 0.00054992735, -0.49990633)
 material_override = SubResource("ShaderMaterial_noarx")
-cast_shadow = 0
 mesh = SubResource("PlaneMesh_a202f")
 skeleton = NodePath("../..")
 
 [node name="POSZ" type="MeshInstance3D" parent="FACES"]
 transform = Transform3D(1.9106853e-15, 4.3711385e-08, 0.99999994, 0.99999994, -4.3711385e-08, 0, 4.3711385e-08, 0.9999999, -4.3711385e-08, 0, 0, 0.5)
 material_override = SubResource("ShaderMaterial_noarx")
-cast_shadow = 0
 mesh = SubResource("PlaneMesh_a202f")
 skeleton = NodePath("../..")
