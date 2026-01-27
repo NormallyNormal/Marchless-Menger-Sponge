@@ -42,6 +42,7 @@ shader = ExtResource("3_h2yge")
 
 [node name="Cylinder" type="MeshInstance3D" parent="SPONGE"]
 material_override = SubResource("StandardMaterial3D_7mycd")
+cast_shadow = 0
 mesh = SubResource("CylinderMesh_h2yge")
 skeleton = NodePath("../..")
 

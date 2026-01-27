@@ -9,7 +9,7 @@ uniform bool orthographic = false;
 
 varying vec3 original_normal;
 
-int check_hole(vec2 uv, out vec2 local_uv, out float current_scale, int max_iterations, int maxsuperhole) {
+int check_hole(vec2 uv, out vec2 local_uv, out float current_scale, int max_iterations, int maxsuperhole, out bool corner, bool was_corner) {
 	vec2 p = uv;
 	
 	int largest_hole = 0;
@@ -17,6 +17,9 @@ int check_hole(vec2 uv, out vec2 local_uv, out float current_scale, int max_iter
 	float largest_scale;
 	
 	for (int i = 1; i <= maxsuperhole; i++) {
+		if (was_corner && i == 2) {
+			continue;
+		}
 		float scale = pow(3.0, float(i));
 		vec2 cell = floor(p / scale);
 		vec2 local = fract(p / scale);
@@ -33,14 +36,21 @@ int check_hole(vec2 uv, out vec2 local_uv, out float current_scale, int max_iter
 		return largest_hole;
 	}
 	
+	corner = false;
+	bool was_corner_last = false;
+	
 	for (int i = 0; i < max_iterations; i++) {
 		vec2 cell = floor(p * 3.0);
 		vec2 local = fract(p * 3.0);
 		if (cell.x == 1.0 && cell.y == 1.0) {
+			if(was_corner_last) {
+				corner = true;
+			}
 			local_uv = local;
 			current_scale = 1.0 / pow(3.0, float(i + 1));
 			return i + 1;
 		}
+		was_corner_last = (abs(p.x - 0.5) > 1.0/6.0) && (abs(p.y - 0.5) > 1.0/6.0);
 		p = p * 3.0 - cell;
 	}
 	return 0;
@@ -110,14 +120,21 @@ float calculate_ao(vec2 face_uv, float z_depth, vec2 hole_uv, int face_id) {
 	float ao = 1.0;
 	float adjacent_edge = 0.0;
 	
+	float depth_edge = 0.0;
+	
 	if (face_id == 2 || face_id == 1) {
 		adjacent_edge = min(face_uv.y, 1.0 - face_uv.y);
+		depth_edge = min(face_uv.x, 1.0 - face_uv.x);
 		ao *= smoothstep(0.0, 0.25, adjacent_edge);
 	}
 	if (face_id == 3 || face_id == 4) {
 		adjacent_edge = min(face_uv.x, 1.0 - face_uv.x);
+		depth_edge = min(face_uv.y, 1.0 - face_uv.y);
 		ao *= smoothstep(0.0, 0.25, adjacent_edge);
 	}
+	
+	float entrance_exit_factor = smoothstep(0.0, 0.3, depth_edge);
+	ao = mix(1.0, ao, entrance_exit_factor);
 	
 	ao *= mix(1.0, 0.7, z_depth);
 	
@@ -144,8 +161,9 @@ void fragment() {
 		view_dir = normalize(VIEW);
 	}
 	
-	int level = check_hole(uv, local_uv, current_scale, hole_iterations, 0);
-	
+	bool is_corner = false;
+	int level = check_hole(uv, local_uv, current_scale, hole_iterations, 0, is_corner, is_corner);
+
 	if (level != 0) {
 		vec3 tan_view = vec3(
 			dot(view_dir, TANGENT),
@@ -187,7 +205,7 @@ void fragment() {
 			
 			vec2 inner_local_uv;
 			float inner_scale;
-			int inner_level = check_hole(cur_face_uv, inner_local_uv, inner_scale, hole_iterations - total_level, hole_iterations - total_level);
+			int inner_level = check_hole(cur_face_uv, inner_local_uv, inner_scale, hole_iterations - total_level, hole_iterations - total_level, is_corner, is_corner);
 			
 			if (inner_level == 0) {
 				break;
@@ -275,7 +293,7 @@ void fragment() {
 		);
 		
 		float ao = mix(1.0, ao_total, ao_strength);
-		float depth_darken = exp(-float(total_level) * 0.3);
+		float depth_darken = exp(-float(total_level) * 0.1);
 		ALBEDO = ALBEDO * ao * depth_darken * 0.4;
 		
 		vec3 interior_pos = VERTEX - normalize(VIEW) * total_ray_length;
