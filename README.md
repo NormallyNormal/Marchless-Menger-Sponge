@@ -22,6 +22,5 @@ level_of_detail: Fades out holes below this threshold. Little effect on performa
 ## Limitations
 * Because this only renders the complex fractal on the surface of the plane meshes, the interior of the fractal cannot be entered.
 * This method probably would not generalize well to other fractals. A jerusalem cube or tetrix may be doable, but not without significant effort and changes.
-* 
 <img width="1914" height="1197" alt="image" src="https://github.com/user-attachments/assets/b6ef79e5-ffd2-4b7e-9a36-ea6fe7c64187" />
 Image is rendered on my laptop (Intel Core Ultra 5 226V, integrated Intel Arc Graphics 130V, 1920x1200 resolution). 300+ FPS is achivable when the post processing is disabled.
