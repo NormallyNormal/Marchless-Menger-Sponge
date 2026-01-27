@@ -15,7 +15,7 @@ next_pass = SubResource("ShaderMaterial_lquwl")
 [sub_resource type="CylinderMesh" id="CylinderMesh_h2yge"]
 top_radius = 0.1
 bottom_radius = 0.1
-height = 4.0
+height = 8.0
 radial_segments = 24
 rings = 0
 cap_top = false
@@ -40,15 +40,14 @@ shader = ExtResource("3_h2yge")
 
 [node name="Main" type="Node3D"]
 
-[node name="SPONGE" parent="." instance=ExtResource("1_ig7tw")]
-
-[node name="Cylinder" type="MeshInstance3D" parent="SPONGE"]
+[node name="Cylinder" type="MeshInstance3D" parent="."]
 material_override = SubResource("StandardMaterial3D_7mycd")
 mesh = SubResource("CylinderMesh_h2yge")
-skeleton = NodePath("../..")
+
+[node name="SPONGE" parent="." instance=ExtResource("1_ig7tw")]
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.31497282, -0.61314076, -0.72446567, -0.1248934, -0.7299041, 0.6720429, -0.9408474, 0.30215618, 0.15332274, -1.9821792, 2.8450701, 1.1811547)
+transform = Transform3D(-0.3369288, -0.88218, -0.32899466, 0.035850424, -0.36119267, 0.93180186, -0.9408474, 0.30215618, 0.15332273, -1.9821792, 2.8450701, 1.1811547)
 shadow_enabled = true
 shadow_normal_bias = 3.0
 directional_shadow_mode = 1
@@ -66,7 +65,6 @@ script = ExtResource("2_0xm2m")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(0.70710677, 0.35355338, -0.6123724, 0, 0.8660254, 0.5, 0.70710677, -0.35355338, 0.6123724, 0, 0, 0)
-visible = false
 shape = SubResource("SphereShape3D_0xm2m")
 
 [node name="Camera3D" type="Camera3D" parent="CollisionShape3D"]

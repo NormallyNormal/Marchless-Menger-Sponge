@@ -12,7 +12,7 @@ shader_parameter/hole_depth = 1.0
 shader_parameter/surface_color = Color(1, 1, 1, 1)
 shader_parameter/ao_strength = 0.5
 shader_parameter/orthographic = false
-shader_parameter/level_of_detail = 3.0
+shader_parameter/level_of_detail = 4.0
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_a202f"]
 size = Vector2(1, 1)
