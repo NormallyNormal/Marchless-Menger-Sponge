@@ -22,10 +22,8 @@ background_mode = 1
 background_color = Color(0.0627451, 0.0627451, 0.0627451, 1)
 ambient_light_source = 2
 ambient_light_color = Color(1, 1, 1, 1)
-ambient_light_energy = 0.1
+ambient_light_energy = 0.02
 glow_enabled = true
-glow_intensity = 1.0
-glow_strength = 0.94
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_0xm2m"]
 radius = 0.866
@@ -42,13 +40,15 @@ shader = ExtResource("3_h2yge")
 
 [node name="Cylinder" type="MeshInstance3D" parent="SPONGE"]
 material_override = SubResource("StandardMaterial3D_7mycd")
-cast_shadow = 0
 mesh = SubResource("CylinderMesh_h2yge")
 skeleton = NodePath("../..")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.096072584, -0.6830603, -0.7240158, -0.1248934, -0.7299041, 0.67204297, -0.9875078, 0.025859889, -0.15543349, -4.191234, 2.8450701, -2.8093805)
+transform = Transform3D(-0.31497282, -0.61314076, -0.72446567, -0.1248934, -0.7299041, 0.6720429, -0.9408474, 0.30215618, 0.15332274, -1.9821792, 2.8450701, 1.1811547)
 shadow_enabled = true
+shadow_normal_bias = 3.0
+directional_shadow_mode = 1
+directional_shadow_max_distance = 5.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_ig7tw")

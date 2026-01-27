@@ -212,7 +212,7 @@ void fragment() {
 			}
 			
 			if (cut == cut_iterations - 1) {
-				ALBEDO = ALBEDO * 0.2;
+				ALBEDO = ALBEDO * 0.5;
 				break;
 			}
 			
@@ -293,15 +293,16 @@ void fragment() {
 		);
 		
 		float ao = mix(1.0, ao_total, ao_strength);
-		float depth_darken = exp(-float(total_level) * 0.1);
-		ALBEDO = ALBEDO * ao * depth_darken * 0.4;
+		float depth_darken = exp(-float(total_level) * 0.3);
+		ALBEDO = ALBEDO * ao * depth_darken;
 		
 		vec3 interior_pos = VERTEX - normalize(VIEW) * total_ray_length;
+		if (level < 5) {
+			LIGHT_VERTEX = interior_pos;
+		}
 		clip_pos = PROJECTION_MATRIX * vec4(interior_pos, 1.0);
 		DEPTH = clip_pos.z / clip_pos.w;
 		
-	} else {
-		ALBEDO = ALBEDO * ((FRONT_FACING) ? 1.0 : 0.4);
 	}
 }
 
