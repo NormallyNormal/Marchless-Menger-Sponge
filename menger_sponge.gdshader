@@ -6,6 +6,7 @@ uniform vec3 surface_color : source_color = vec3(1.0);
 uniform float ao_strength : hint_range(0.0, 1.0) = 0.5;
 uniform bool orthographic = false;
 uniform float level_of_detail : hint_range(1.0, 10.0) = 4.0;
+uniform bool fast_shadows = true;
 varying vec3 original_normal;
 varying float hole_fade;
 varying vec3 interior_albedo;
@@ -165,7 +166,7 @@ void fragment() {
 		
 		if (detail_threshold > level_of_detail) {
 			// lod exit
-		} else if (!FRONT_FACING) {
+		} else if (!FRONT_FACING && fast_shadows) {
 			// shadow only pass, so run a simple form
 			vec3 tan_view = vec3(
 				-dot(view_dir, TANGENT),
