@@ -9,6 +9,8 @@ uniform bool orthographic = false;
 uniform float level_of_detail : hint_range(1.0, 10.0) = 4.0;
 
 varying vec3 original_normal;
+varying float hole_fade;
+varying vec3 interior_albedo;
 
 const float POW3[7] = {1.0, 3.0, 9.0, 27.0, 81.0, 243.0, 729.0};
 const float INV_POW3[7] = {1.0, 0.333333333, 0.111111111, 0.037037037, 0.012345679, 0.004115226, 0.001371742};
@@ -141,6 +143,7 @@ float calculate_ao(vec2 face_uv, float z_depth, int face_id) {
 }
 
 void fragment() {
+	hole_fade = 0.0;
 	ALBEDO = surface_color;
 	original_normal = NORMAL;
 
@@ -293,11 +296,13 @@ void fragment() {
 
 			float ao = mix(1.0, ao_total, ao_strength);
 			float depth_darken = exp(float(-total_level) * 0.3);
-			float hole_fade = smoothstep(0.0, 1.0, clamp(level_of_detail - detail_threshold, 0.0, 1.0));
-			ALBEDO *= ao * depth_darken;
-			ALBEDO = mix(surface_color, ALBEDO, hole_fade);
+			hole_fade = smoothstep(0.0, 1.0, clamp(level_of_detail - detail_threshold, 0.0, 1.0));
+			interior_albedo = surface_color * ao * depth_darken;
+			ALBEDO = mix(surface_color, interior_albedo, hole_fade);
+			NORMAL = mix(original_normal, NORMAL, hole_fade);
 
 			vec3 interior_pos = VERTEX - normalize(VIEW) * total_ray_length;
+			vec3 faded_pos = mix(VERTEX, interior_pos, hole_fade);
 			if (level < 6) {
 				LIGHT_VERTEX = interior_pos;
 			}
@@ -305,4 +310,15 @@ void fragment() {
 			DEPTH = clip_pos.z / clip_pos.w;
 		}
 	}
+}
+
+void light() {
+	vec3 interior_light = LIGHT_COLOR * (1.0 / PI) * ATTENUATION * max(dot(NORMAL, LIGHT), 0.0);
+	vec3 surface_light = LIGHT_COLOR * (1.0 / PI) * ATTENUATION * max(dot(original_normal, LIGHT), 0.0);
+
+	DIFFUSE_LIGHT += mix(
+		surface_color * surface_light,
+		interior_albedo * interior_light,
+		hole_fade
+	);
 }

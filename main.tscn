@@ -47,7 +47,7 @@ mesh = SubResource("CylinderMesh_h2yge")
 [node name="SPONGE" parent="." instance=ExtResource("1_ig7tw")]
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.3369288, -0.88218, -0.32899466, 0.035850424, -0.36119267, 0.93180186, -0.9408474, 0.30215618, 0.15332273, -1.9821792, 2.8450701, 1.1811547)
+transform = Transform3D(-0.16842335, -0.74866474, -0.6411978, -0.08006639, -0.63795024, 0.76590395, -0.9824576, 0.18033451, 0.04750283, -1.9821792, 2.8450701, 1.1811547)
 shadow_enabled = true
 shadow_normal_bias = 3.0
 directional_shadow_mode = 1
@@ -74,7 +74,7 @@ keep_aspect = 0
 current = true
 
 [node name="DepthQuad" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0010103732, 0.58779514)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.6)
 visible = false
 material_override = SubResource("ShaderMaterial_1bvp3")
 mesh = SubResource("QuadMesh_lquwl")
