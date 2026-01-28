@@ -12,8 +12,6 @@ menger_sponge.gdshader is the only file of real significance. Everything else is
 
 **cut_iterations:** How many layers deep to raycast into interior walls.
 
-**hole_depth:** Base depth of holes. Affects parallax intensity, probably shouldn't be changed.
-
 **surface_color:** Pretty much what it says on the tin. Color of the surfaces.
 
 **ao_strength:** Blending strength of the approximated ambient occlusion.
