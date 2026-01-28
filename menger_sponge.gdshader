@@ -306,10 +306,3 @@ void fragment() {
 		}
 	}
 }
-
-void light() {
-	float NdotL = dot(NORMAL, LIGHT);
-	float surface_NdotL = dot(original_normal, LIGHT);
-	float final_NdotL = clamp(min(NdotL, surface_NdotL), 0.0, 1.0);
-	DIFFUSE_LIGHT += LIGHT_COLOR * (1.0 / PI) * ATTENUATION * final_NdotL;
-}
