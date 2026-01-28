@@ -14,6 +14,7 @@ const float INV_POW3[7] = {1.0, 0.333333333, 0.111111111, 0.037037037, 0.0123456
 
 int check_hole(vec2 uv, out vec2 local_uv, out float current_scale, int max_iterations, int maxsuperhole, out bool corner, bool was_corner) {
 	vec2 p = uv;
+	current_scale = 1.0;
 	int largest_hole = 0;
 	vec2 largest_local_uv;
 	float largest_scale;
@@ -160,6 +161,7 @@ void fragment() {
 	
 	if (level != 0) {
 		float uv_detail = fwidth(UV.x) + fwidth(UV.y);
+		uv_detail = min(uv_detail, 1.0);
 		float detail_threshold = uv_detail / current_scale;
 		
 		if (detail_threshold > level_of_detail) {
@@ -225,8 +227,9 @@ void fragment() {
 				
 				if (inner_level == 0) break;
 				
-				detail_threshold = fwidth(cur_face_uv.x) + fwidth(cur_face_uv.y);
-				if (detail_threshold / inner_scale > level_of_detail) break;
+				float inner_uv_detail = min(fwidth(cur_face_uv.x) + fwidth(cur_face_uv.y), 1.0);
+				float inner_detail_threshold = inner_uv_detail / inner_scale;
+				if (inner_detail_threshold > level_of_detail) break;
 				
 				if (cut == cut_iterations - 1) {
 					ALBEDO *= 0.5;
@@ -300,9 +303,9 @@ void fragment() {
 				cur_tan_normal.z * cur_normal
 			);
 			
-			float ao = mix(1.0, ao_total, ao_strength);
-			float depth_darken = exp(float(-total_level) * 0.3);
-			hole_fade = smoothstep(0.0, 1.0, clamp(level_of_detail - detail_threshold, 0.0, 1.0));
+			float ao = mix(1.0, ao_total, ao_strength * hole_fade);
+			float depth_darken = exp((float(-total_level) + (1.0 - hole_fade)) * 0.3);
+			hole_fade = clamp(level_of_detail - detail_threshold, 0.0, 1.0);
 			interior_albedo = ALBEDO * ao * depth_darken;
 			ALBEDO = mix(surface_color, interior_albedo, hole_fade);
 			NORMAL = mix(original_normal, NORMAL, hole_fade);
@@ -314,7 +317,7 @@ void fragment() {
 				LIGHT_VERTEX = interior_pos;
 			}
 			
-			clip_pos = PROJECTION_MATRIX * vec4(interior_pos, 1.0);
+			clip_pos = PROJECTION_MATRIX * vec4(faded_pos, 1.0);
 			DEPTH = clip_pos.z / clip_pos.w;
 		}
 	}

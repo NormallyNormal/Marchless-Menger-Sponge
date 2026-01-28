@@ -27,6 +27,7 @@ background_color = Color(0.0627451, 0.0627451, 0.0627451, 1)
 ambient_light_source = 2
 ambient_light_color = Color(1, 1, 1, 1)
 ambient_light_energy = 0.02
+volumetric_fog_density = 1.0
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_0xm2m"]
 radius = 0.866

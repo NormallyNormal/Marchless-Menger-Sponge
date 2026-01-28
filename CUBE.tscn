@@ -8,7 +8,6 @@ render_priority = 0
 shader = ExtResource("1_a202f")
 shader_parameter/hole_iterations = 6
 shader_parameter/cut_iterations = 4
-shader_parameter/hole_depth = 1.0
 shader_parameter/surface_color = Color(1, 1, 1, 1)
 shader_parameter/ao_strength = 0.5
 shader_parameter/orthographic = false
