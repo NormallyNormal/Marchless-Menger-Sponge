@@ -297,7 +297,7 @@ void fragment() {
 			float ao = mix(1.0, ao_total, ao_strength);
 			float depth_darken = exp(float(-total_level) * 0.3);
 			hole_fade = smoothstep(0.0, 1.0, clamp(level_of_detail - detail_threshold, 0.0, 1.0));
-			interior_albedo = surface_color * ao * depth_darken;
+			interior_albedo = ALBEDO * ao * depth_darken;
 			ALBEDO = mix(surface_color, interior_albedo, hole_fade);
 			NORMAL = mix(original_normal, NORMAL, hole_fade);
 
