@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://cqupusd727gd4"]
+[gd_scene format=3 uid="uid://cqupusd727gd4"]
 
 [ext_resource type="Shader" uid="uid://dqqjeb3ly80ur" path="res://menger_sponge.gdshader" id="1_a202f"]
 [ext_resource type="Script" uid="uid://dbvj6cjd0plrf" path="res://cube.gd" id="1_emqm4"]
@@ -18,42 +18,42 @@ shader_parameter/fast_shadows = true
 [sub_resource type="PlaneMesh" id="PlaneMesh_a202f"]
 size = Vector2(1, 1)
 
-[node name="CUBE" type="Node3D"]
+[node name="CUBE" type="Node3D" unique_id=919829381]
 script = ExtResource("1_emqm4")
 
-[node name="FACES" type="Node3D" parent="."]
+[node name="FACES" type="Node3D" parent="." unique_id=1513452817]
 
-[node name="POSY" type="MeshInstance3D" parent="FACES"]
+[node name="POSY" type="MeshInstance3D" parent="FACES" unique_id=947151497]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 material_override = SubResource("ShaderMaterial_noarx")
 mesh = SubResource("PlaneMesh_a202f")
 skeleton = NodePath("../..")
 
-[node name="NEGY" type="MeshInstance3D" parent="FACES"]
+[node name="NEGY" type="MeshInstance3D" parent="FACES" unique_id=911352943]
 transform = Transform3D(4.3711385e-08, -3.8213705e-15, 0.99999994, -8.742277e-08, -0.9999999, 0, 0.99999994, -8.742277e-08, -4.3711385e-08, 0, -0.5, 0)
 material_override = SubResource("ShaderMaterial_noarx")
 mesh = SubResource("PlaneMesh_a202f")
 skeleton = NodePath("../..")
 
-[node name="NEGX" type="MeshInstance3D" parent="FACES"]
+[node name="NEGX" type="MeshInstance3D" parent="FACES" unique_id=659909877]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, -0.5, 0, 0)
 material_override = SubResource("ShaderMaterial_noarx")
 mesh = SubResource("PlaneMesh_a202f")
 skeleton = NodePath("../..")
 
-[node name="POSX" type="MeshInstance3D" parent="FACES"]
+[node name="POSX" type="MeshInstance3D" parent="FACES" unique_id=1277193190]
 transform = Transform3D(4.371139e-08, 0.9999999, -8.742277e-08, 1, -4.3711385e-08, 0, -3.821371e-15, -8.742277e-08, -0.9999999, 0.5, 0, 0)
 material_override = SubResource("ShaderMaterial_noarx")
 mesh = SubResource("PlaneMesh_a202f")
 skeleton = NodePath("../..")
 
-[node name="NEGZ" type="MeshInstance3D" parent="FACES"]
+[node name="NEGZ" type="MeshInstance3D" parent="FACES" unique_id=2008441149]
 transform = Transform3D(1.910685e-15, 4.371138e-08, -0.99999976, 0.9999999, -4.371138e-08, 0, -4.371138e-08, -0.9999999, -4.3711378e-08, 1.5437603e-05, 0.00054992735, -0.49990633)
 material_override = SubResource("ShaderMaterial_noarx")
 mesh = SubResource("PlaneMesh_a202f")
 skeleton = NodePath("../..")
 
-[node name="POSZ" type="MeshInstance3D" parent="FACES"]
+[node name="POSZ" type="MeshInstance3D" parent="FACES" unique_id=2128793948]
 transform = Transform3D(1.9106853e-15, 4.3711385e-08, 0.99999994, 0.99999994, -4.3711385e-08, 0, 4.3711385e-08, 0.9999999, -4.3711385e-08, 0, 0, 0.5)
 material_override = SubResource("ShaderMaterial_noarx")
 mesh = SubResource("PlaneMesh_a202f")

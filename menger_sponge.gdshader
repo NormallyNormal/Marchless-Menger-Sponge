@@ -1,7 +1,6 @@
 shader_type spatial;
 uniform int hole_iterations : hint_range(1, 8) = 6;
 uniform int cut_iterations : hint_range(1, 4) = 4;
-uniform float hole_depth : hint_range(0.1, 5.0) = 1.0;
 uniform vec3 surface_color : source_color = vec3(1.0);
 uniform float ao_strength : hint_range(0.0, 1.0) = 0.5;
 uniform bool orthographic = false;
@@ -52,11 +51,11 @@ int check_hole(vec2 uv, out vec2 local_uv, out float current_scale, int max_iter
 	return 0;
 }
 
-float ray_box_depth_only(vec2 hole_uv, vec3 view_dir, float depth, float depth_stretch, out int face_id) {
+float ray_box_depth_only(vec2 hole_uv, vec3 view_dir, float depth_stretch, out int face_id) {
 	vec2 pos = hole_uv * 2.0 - 1.0;
 	vec3 ro = vec3(pos, 0.0);
 	vec3 rd = normalize(view_dir);
-	float scaled_depth = depth * depth_stretch;
+	float scaled_depth = 2.0 * depth_stretch;
 	vec3 inv_rd = 1.0 / rd;
 	vec3 t1 = vec3(-1.0, -1.0, -scaled_depth) * inv_rd - ro * inv_rd;
 	vec3 t2 = vec3(1.0, 1.0, 0.0) * inv_rd - ro * inv_rd;
@@ -72,12 +71,12 @@ float ray_box_depth_only(vec2 hole_uv, vec3 view_dir, float depth, float depth_s
 	return abs(t);
 }
 
-vec3 ray_box_interior(vec2 hole_uv, vec3 view_dir, float depth, float depth_stretch,
+vec3 ray_box_interior(vec2 hole_uv, vec3 view_dir, float depth_stretch,
 					  out vec2 face_uv, out int face_id, out float z_depth, out float ray_length) {
 	vec2 pos = hole_uv * 2.0 - 1.0;
 	vec3 ro = vec3(pos, 0.0);
 	vec3 rd = normalize(view_dir);
-	float scaled_depth = depth * depth_stretch;
+	float scaled_depth = 2.0 * depth_stretch;
 	vec3 inv_rd = 1.0 / rd;
 	vec3 t1 = vec3(-1.0, -1.0, -scaled_depth) * inv_rd - ro * inv_rd;
 	vec3 t2 = vec3(1.0, 1.0, 0.0) * inv_rd - ro * inv_rd;
@@ -85,7 +84,6 @@ vec3 ray_box_interior(vec2 hole_uv, vec3 view_dir, float depth, float depth_stre
 	float t = min(min(t_far.x, t_far.y), t_far.z);
 	ray_length = abs(t);
 	vec3 hit = ro + rd * t;
-	float inv_depth = 1.0 / depth;
 	float inv_scaled_depth = 1.0 / scaled_depth;
 	z_depth = -hit.z * inv_scaled_depth;
 	vec3 abs_hit = abs(hit);
@@ -95,7 +93,7 @@ vec3 ray_box_interior(vec2 hole_uv, vec3 view_dir, float depth, float depth_stre
 		face_uv = vec2(0.0);
 		return vec3(0.0);
 	}
-	float neg_z_scaled = -hit.z * inv_depth;
+	float neg_z_scaled = -hit.z * 0.5;
 	if (abs_hit.y > abs_hit.x) {
 		face_uv = vec2((hit.x + 1.0) * 0.5, neg_z_scaled);
 		if (hit.y > 0.0) {
@@ -176,7 +174,7 @@ void fragment() {
 			
 			int face_id;
 			float depth_stretch = POW3[min(level - 1, 6)];
-			float ray_length = ray_box_depth_only(local_uv, tan_view, hole_depth * 2.0, depth_stretch, face_id);
+			float ray_length = ray_box_depth_only(local_uv, tan_view, depth_stretch, face_id);
 			
 			if (face_id == 0) discard;
 			
@@ -199,7 +197,7 @@ void fragment() {
 			float z_depth;
 			float ray_length;
 			float depth_stretch = POW3[min(level, 6)];
-			vec3 tan_normal = ray_box_interior(local_uv, tan_view, hole_depth * 2.0, depth_stretch,
+			vec3 tan_normal = ray_box_interior(local_uv, tan_view, depth_stretch,
 												face_uv, face_id, z_depth, ray_length);
 			
 			float accumulated_scale = current_scale * 0.5;
@@ -279,7 +277,7 @@ void fragment() {
 				float new_ray_length;
 				int abs_inner = abs(inner_level);
 				float inner_depth_stretch = POW3[min(abs_inner, 6)];
-				vec3 new_tan_normal = ray_box_interior(inner_local_uv, inner_tan_view, hole_depth * 2.0, inner_depth_stretch, new_face_uv, new_face_id, new_z_depth, new_ray_length);
+				vec3 new_tan_normal = ray_box_interior(inner_local_uv, inner_tan_view, inner_depth_stretch, new_face_uv, new_face_id, new_z_depth, new_ray_length);
 				
 				accumulated_scale *= inner_scale;
 				total_ray_length += new_ray_length * accumulated_scale;

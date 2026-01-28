@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://bxit7scrjjod"]
+[gd_scene format=3 uid="uid://bxit7scrjjod"]
 
 [ext_resource type="PackedScene" uid="uid://cqupusd727gd4" path="res://CUBE.tscn" id="1_ig7tw"]
 [ext_resource type="Script" uid="uid://dvlbf3tilki2m" path="res://fps.gd" id="2_0xm2m"]
@@ -27,7 +27,6 @@ background_color = Color(0.0627451, 0.0627451, 0.0627451, 1)
 ambient_light_source = 2
 ambient_light_color = Color(1, 1, 1, 1)
 ambient_light_energy = 0.02
-glow_enabled = true
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_0xm2m"]
 radius = 0.866
@@ -38,15 +37,15 @@ shader = ExtResource("3_h2yge")
 
 [sub_resource type="QuadMesh" id="QuadMesh_lquwl"]
 
-[node name="Main" type="Node3D"]
+[node name="Main" type="Node3D" unique_id=1703489159]
 
-[node name="Cylinder" type="MeshInstance3D" parent="."]
+[node name="Cylinder" type="MeshInstance3D" parent="." unique_id=836554044]
 material_override = SubResource("StandardMaterial3D_7mycd")
 mesh = SubResource("CylinderMesh_h2yge")
 
-[node name="SPONGE" parent="." instance=ExtResource("1_ig7tw")]
+[node name="SPONGE" parent="." unique_id=181852939 instance=ExtResource("1_ig7tw")]
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1047470410]
 transform = Transform3D(-0.16842335, -0.74866474, -0.6411978, -0.08006639, -0.63795024, 0.76590395, -0.9824576, 0.18033451, 0.04750283, -1.9821792, 2.8450701, 1.1811547)
 shadow_enabled = true
 shadow_bias = 0.05
@@ -54,27 +53,27 @@ shadow_normal_bias = 8.0
 directional_shadow_mode = 1
 directional_shadow_max_distance = 5.0
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1534821946]
 environment = SubResource("Environment_ig7tw")
 
-[node name="FPS" type="Label" parent="."]
+[node name="FPS" type="Label" parent="." unique_id=1658155840]
 offset_right = 216.0
 offset_bottom = 136.0
 theme_override_font_sizes/font_size = 16
 text = "99"
 script = ExtResource("2_0xm2m")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1087939983]
 transform = Transform3D(0.70710677, 0.35355338, -0.6123724, 0, 0.8660254, 0.5, 0.70710677, -0.35355338, 0.6123724, 0, 0, 0)
 visible = false
 shape = SubResource("SphereShape3D_0xm2m")
 
-[node name="Camera3D" type="Camera3D" parent="CollisionShape3D"]
+[node name="Camera3D" type="Camera3D" parent="CollisionShape3D" unique_id=876865378]
 transform = Transform3D(1.0000001, 0, 0, 0, 1, 2.9802322e-08, 0, -2.9802322e-08, 1.0000001, 0, -0.13402975, 1.9226179)
 keep_aspect = 0
 current = true
 
-[node name="DepthQuad" type="MeshInstance3D" parent="."]
+[node name="DepthQuad" type="MeshInstance3D" parent="." unique_id=1150979700]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.6)
 visible = false
 material_override = SubResource("ShaderMaterial_1bvp3")
