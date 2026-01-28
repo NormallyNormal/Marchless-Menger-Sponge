@@ -174,7 +174,7 @@ void fragment() {
 			);
 			
 			int face_id;
-			float depth_stretch = POW3[min(level, 6)];
+			float depth_stretch = POW3[min(level - 1, 6)];
 			float ray_length = ray_box_depth_only(local_uv, tan_view, hole_depth * 2.0, depth_stretch, face_id);
 			
 			if (face_id == 0) discard;
