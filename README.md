@@ -22,6 +22,8 @@ menger_sponge.gdshader is the only file of real significance. Everything else is
 
 **level_of_detail:** Fades out holes below this threshold. Little effect on performance, because it's just meant to reduce aliasing and Moiré patterns.
 
+**fast_shadows:** Uses a simpler render for shadow passes. A bit less accurate for interior shadows, but much faster especially with high res shadow maps.
+
 ## Advantages
 
 * This is less isolated from the typical game rendering pipeline, so it plays well with other meshes in the scene, which can pass inside the holes or cast shadows onto it.
