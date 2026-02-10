@@ -1,4 +1,4 @@
 extends Label
 
 func _process(_delta):
-	text = "FPS: %d" % Engine.get_frames_per_second()
+	text = "GPU Time: %.2fms" % (Performance.get_monitor(Performance.TIME_PROCESS) * 1000)

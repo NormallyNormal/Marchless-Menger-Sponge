@@ -25,7 +25,7 @@ int check_hole(vec2 uv, out vec2 local_uv, out float current_scale, int max_iter
 		vec2 cell3 = floor(local * 3.0);
 		if (cell3.x == 1.0 || cell3.y == 1.0) {
 			largest_local_uv = fract(local * 3.0);
-			largest_scale = INV_POW3[i - 1];
+			largest_scale = POW3[i - 1];
 			largest_hole = -i;
 		}
 	}
@@ -64,6 +64,9 @@ float ray_box_depth_only(vec2 hole_uv, vec3 view_dir, float depth_stretch, out i
 	float t = min(min(t_far.x, t_far.y), t_far.z);
 	vec3 hit = ro + rd * t;
 	float eps = 0.001;
+	//if (mod(hit.z, 3.0) > 1.0  && mod(hit.z, 3.0) < 2.0) {
+		//discard;
+	//}
 	if (abs(hit.z + scaled_depth) < eps) {
 		face_id = 0;
 		return 0.0;
@@ -160,6 +163,7 @@ void fragment() {
 	else level = check_hole(UV, local_uv, current_scale, min(hole_iterations, 4), 0, is_corner, false);
 	
 	if (level != 0) {
+		//potentially undefined behavior, may change
 		float uv_detail = fwidth(UV.x) + fwidth(UV.y);
 		uv_detail = min(uv_detail, 1.0);
 		float detail_threshold = uv_detail / current_scale;
@@ -178,10 +182,10 @@ void fragment() {
 			float depth_stretch = POW3[min(level - 1, 6)];
 			float ray_length = ray_box_depth_only(local_uv, tan_view, depth_stretch, face_id);
 			
-			if (face_id == 0) discard;
-			
 			float accumulated_scale = current_scale * 0.5;
 			float total_ray_length = ray_length * accumulated_scale;
+			
+			if (face_id == 0) total_ray_length = 1.0;
 			
 			vec3 interior_pos = VERTEX - normalize(VIEW) * total_ray_length;
 			clip_pos = PROJECTION_MATRIX * vec4(interior_pos, 1.0);
@@ -227,6 +231,7 @@ void fragment() {
 				
 				if (inner_level == 0) break;
 				
+				//potentially undefined behavior, may change
 				float inner_uv_detail = min(fwidth(cur_face_uv.x) + fwidth(cur_face_uv.y), 1.0);
 				float inner_detail_threshold = inner_uv_detail / inner_scale;
 				if (inner_detail_threshold > level_of_detail) break;
