@@ -4,6 +4,7 @@ A Godot 4.7 Forward+ spatial shader that renders a finite Menger sponge on the s
 
 Instead of building dense fractal geometry or raymarching through the entire volume, the shader analytically traverses the sponge's axis-aligned tunnels. It writes the depth and normals of the first visible interior wall, uses automatic screen-space level of detail (LOD), supports several ambient occlusion (AO) modes, and participates in Godot's normal PBR and shadow pipeline.
 
+![Menger Sponge rendered with default settings](https://github.com/NormallyNormal/Marchless-Menger-Sponge/blob/main/example.png)
 ## Requirements
 
 - Godot 4.7
