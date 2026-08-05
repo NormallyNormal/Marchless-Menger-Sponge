@@ -10,9 +10,11 @@ shader_parameter/hole_iterations = 6
 shader_parameter/cut_iterations = 4
 shader_parameter/surface_color = Color(1, 1, 1, 1)
 shader_parameter/ao_strength = 0.5
+shader_parameter/ambient_quality = 1
+shader_parameter/surface_roughness = 0.8
+shader_parameter/surface_metallic = 0.0
 shader_parameter/orthographic = false
-shader_parameter/level_of_detail = 4.0
-shader_parameter/fast_shadows = true
+shader_parameter/shadow_dilation = 1
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_a202f"]
 size = Vector2(1, 1)
@@ -47,7 +49,7 @@ mesh = SubResource("PlaneMesh_a202f")
 skeleton = NodePath("../..")
 
 [node name="NEGZ" type="MeshInstance3D" parent="FACES" unique_id=2008441149]
-transform = Transform3D(1.910685e-15, 4.371138e-08, -0.99999976, 0.9999999, -4.371138e-08, 0, -4.371138e-08, -0.9999999, -4.3711378e-08, 1.5437603e-05, 0.00054992735, -0.49990633)
+transform = Transform3D(1.910685e-15, 4.371138e-08, -0.99999976, 0.9999999, -4.371138e-08, 0, -4.371138e-08, -0.9999999, -4.3711378e-08, 0, 0, -0.5)
 material_override = SubResource("ShaderMaterial_noarx")
 mesh = SubResource("PlaneMesh_a202f")
 skeleton = NodePath("../..")
